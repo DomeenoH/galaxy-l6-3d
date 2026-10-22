@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>DAE → GLB</title>
+<script type="importmap">{"imports":{"three":"../vendor/three.module.js"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { ColladaLoader } from '../vendor/ColladaLoader.js';
+import { GLTFExporter } from '../vendor/GLTFExporter.js';
+
+window.__convert = (url) => new Promise((res, rej) => {
+  new ColladaLoader().load(url, (dae) => {
+    const scene = dae.scene;
+    const info = [];
+    let tri = 0;
+    const missing = [];
+    scene.traverse(o => {
+      if (o.isMesh) {
+        // 丢掉加载失败的贴图，否则导出器会报错
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        for (const m of mats) {
+          if (!m) continue;
+          for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap']) {
+            const t = m[k];
+            if (t && (!t.image || !t.image.width)) { missing.push(m.name + '.' + k); m[k] = null; m.needsUpdate = true; }
+          }
+        }
+        tri += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3;
+        o.geometry.computeBoundingBox();
+        info.push({ name: o.name, bb: o.geometry.boundingBox.clone(), mat: o.material?.name });
+      }
+    });
+    new GLTFExporter().parse(scene, (buf) => {
+      const b = new Uint8Array(buf);
+      let s = '';
+      for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode.apply(null, b.subarray(i, i + 8192));
+      res({ b64: btoa(s), tri, meshes: info.length, info, missing });
+    }, (e) => rej(e), { binary: true });
+  }, undefined, (e) => rej(e));
+});
+window.__ready = true;
+</script>
+</body></html>

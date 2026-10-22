@@ -1,0 +1,374 @@
+/* =========================================================
+   吉利银河 L6 · 影棚分镜
+   UI 骨架照搬 gamemcu.com/su7：
+   顶部居中文案 / 右侧竖排章节点 / 底部色卡胶囊 / 左侧滑杆
+   单位一律用 vmin，整屏影院感
+   ========================================================= */
+
+:root {
+  --bg:      #04060a;
+  --ink:     #ffffff;
+  --muted:   #98a0ac;
+  --dim:     #5d6673;
+  --accent:  #ff9245;
+  --sand:    #f0c69f;
+  --line:    #ffffff26;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC",
+               -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+#gl {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  outline: none;
+  z-index: 0;
+}
+
+/* 上下压暗，把 UI 从画面里"托"出来 */
+.scrim {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  /* 上沿这层遮罩是给标题文字兜底的。
+     ⚠️ 顶部 6% 必须留空 —— 后处理里那条「柔光箱」白带就在那儿，
+     遮罩压上去会把它从 255 吃到 123，白带直接废掉。
+     所以这里从 0 开始透明，到 9% 才起暗。 */
+  background:
+    linear-gradient(to bottom,
+      rgba(4,6,10,0) 0%, rgba(4,6,10,0) 5.5%,
+      rgba(4,6,10,.46) 11%, rgba(4,6,10,.22) 20%, rgba(4,6,10,0) 36%),
+    linear-gradient(to top,    rgba(4,6,10,.72) 0%, rgba(4,6,10,.16) 16%, rgba(4,6,10,0) 30%);
+}
+
+.grain {
+  position: fixed; inset: -50%; z-index: 2; pointer-events: none;
+  opacity: .05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 6s steps(6) infinite;
+}
+@keyframes grain {
+  0%   { transform: translate(0,0) }
+  20%  { transform: translate(-3%, 2%) }
+  40%  { transform: translate(2%, -3%) }
+  60%  { transform: translate(-2%, -2%) }
+  80%  { transform: translate(3%, 1%) }
+  100% { transform: translate(0,0) }
+}
+
+/* 切章白闪（SU7 的 .key_Light） */
+#flash {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: #fff; opacity: 0;
+}
+#flash.on { animation: flash .46s ease-out; }
+@keyframes flash { 0% { opacity: .5 } 100% { opacity: 0 } }
+
+/* ---------------- 预加载 ---------------- */
+#preloader {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #000;
+  transition: opacity .7s ease, visibility .7s;
+}
+#preloader.gone { opacity: 0; visibility: hidden; }
+
+.pl-ring { position: relative; width: 26vmin; height: 26vmin; }
+.pl-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.pl-ring circle { fill: none; stroke-width: 2.2; }
+.pl-bg { stroke: #ffffff1c; }
+.pl-fg {
+  stroke: var(--accent); stroke-linecap: round;
+  stroke-dasharray: 283; stroke-dashoffset: 283;
+  transition: stroke-dashoffset .25s linear;
+  filter: drop-shadow(0 0 6px rgba(255,146,69,.55));
+}
+.pl-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5.2vmin; font-weight: 200; letter-spacing: .02em;
+}
+.pl-num i { font-style: normal; font-size: 2.1vmin; color: var(--muted); margin-left: .35em; align-self: flex-end; margin-bottom: 1.1vmin; }
+.pl-tip { margin-top: 3vmin; font-size: 1.5vmin; color: var(--dim); letter-spacing: .16em; }
+.pl-ver { position: absolute; left: 2vmin; bottom: 1.6vmin; font-size: 1.1vmin; color: #333b45; letter-spacing: .28em; }
+
+/* ---------------- 顶栏 ---------------- */
+#logo {
+  position: fixed; top: 7.2vmin; left: 3.4vmin; z-index: 20;
+  display: flex; align-items: center; gap: .8vmin;
+  font-size: 1.5vmin; letter-spacing: .05em;
+  pointer-events: none;
+}
+#logo .mark {
+  width: .9vmin; height: .9vmin; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 10px rgba(255,146,69,.8);
+}
+#logo b { font-weight: 500; }
+#logo i { font-style: normal; color: var(--dim); font-size: 1.2vmin; margin-left: .6vmin; }
+
+#free {
+  position: fixed; top: 7.2vmin; left: 25vmin; z-index: 21;
+  font-size: 1.2vmin; color: var(--dim); text-decoration: none;
+  letter-spacing: .08em; transition: color .25s;
+}
+#free:hover { color: var(--accent); }
+
+#meta {
+  position: fixed; top: 7.2vmin; right: 3.4vmin; z-index: 20;
+  font-size: 1.1vmin; color: var(--dim); letter-spacing: .06em;
+  pointer-events: none; text-align: right;
+}
+
+#mute {
+  position: fixed; top: 10.4vmin; right: 3.4vmin; z-index: 21;
+  width: 3.2vmin; height: 3.2vmin; padding: 0;
+  border: 0; border-radius: 50%; cursor: pointer;
+  background: #ffffff14; color: #c9d2dd; font-size: 1.5vmin; line-height: 1;
+  transition: transform .2s, background .2s, color .2s;
+}
+#mute:hover { transform: scale(1.14); background: #ffffff26; }
+#mute.off { color: #4d545e; text-decoration: line-through; }
+
+/* ---------------- 顶部居中文案 ---------------- */
+#topinfo {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 15;
+  pointer-events: none;
+}
+.ch {
+  position: absolute; top: 9.2vmin; left: 50%;
+  width: min(88vw, 92vmin);
+  transform: translateX(-50%) translateY(1.4vmin);
+  text-align: center;
+  opacity: 0; will-change: opacity, transform;
+  transition: opacity .85s cubic-bezier(.22,.61,.36,1),
+              transform .85s cubic-bezier(.22,.61,.36,1);
+}
+.ch.on { opacity: 1; transform: translateX(-50%); }
+.ch .kicker {
+  margin: 0 0 1.1vmin;
+  font-size: 1.5vmin; color: var(--dim); letter-spacing: .18em;
+}
+.ch .title {
+  margin: 0;
+  font-size: clamp(26px, 3.6vmin, 54px);
+  font-weight: 300; line-height: 1.22; letter-spacing: .01em;
+  text-wrap: balance;
+}
+.ch .title em { font-style: normal; color: var(--accent); }
+.ch[data-i="0"] .title { font-size: clamp(34px, 5.6vmin, 84px); letter-spacing: .02em; }
+.ch .lead { margin: 1.8vmin 0 0; font-size: 1.6vmin; color: #c3cbd6; letter-spacing: .06em; }
+.ch .body {
+  margin: 1.6vmin auto 0; max-width: 62vmin;
+  font-size: 1.42vmin; line-height: 1.95; color: var(--muted); letter-spacing: .02em;
+}
+
+/* ---------------- 第 5 章大字水印 ---------------- */
+#wm {
+  position: fixed; left: 3.4vmin; bottom: 4.2vmin; z-index: 16;
+  pointer-events: none;
+  opacity: 0; transform: translateY(2.2vmin);
+  transition: opacity .9s cubic-bezier(.22,.61,.36,1),
+              transform .9s cubic-bezier(.22,.61,.36,1);
+}
+#wm.on { opacity: 1; transform: none; }
+#wm b {
+  display: block;
+  font-size: 10vmin; font-weight: 200; line-height: .88;
+  letter-spacing: -.025em; color: #fff;
+  text-shadow: 0 0 40px rgba(0,0,0,.6);
+}
+#wm i {
+  display: block; margin-top: .9vmin;
+  font-style: normal; font-size: 1.15vmin;
+  letter-spacing: .46em; color: var(--muted);
+}
+
+/* ---------------- 3D 标注 ---------------- */
+#annot { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
+.an { position: absolute; inset: 0; opacity: 0; }
+/* 虚线要压过地面倒影才读得出来 —— 给一层暗色投影当底 */
+.an svg { position: absolute; overflow: visible; filter: drop-shadow(0 0 3px rgba(0,0,0,.9)); }
+.an .an-l { stroke: #ffffff99; stroke-width: 1.0; stroke-dasharray: 4 6; }
+.an .an-t { stroke: #ffffff99; stroke-width: 1.0; }
+.an .an-lb {
+  position: absolute; left: 0; top: 0;
+  font-size: 1.45vmin; font-weight: 400; color: #fff;
+  letter-spacing: .04em; white-space: nowrap;
+  text-shadow: 0 1px 12px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.85);
+}
+
+/* ---------------- 右侧章节点 ---------------- */
+#nav {
+  position: fixed; top: 25vmin; right: 3.2vmin; z-index: 20;
+  height: 50vmin; width: 9vmin;
+  display: flex; align-items: center; justify-content: flex-end;
+}
+#nav .rail {
+  position: absolute; right: 2.9vmin; top: 0; bottom: 0;
+  width: 1px; background: var(--line);
+}
+#nav .items {
+  position: relative; height: 100%;
+  display: flex; flex-direction: column; justify-content: space-between;
+  align-items: flex-end;
+}
+#nav .it {
+  position: relative;
+  display: flex; align-items: center; gap: 1.1vmin;
+  height: 1.4vmin; padding: 0; border: 0; background: none;
+  cursor: pointer; color: #cfd6df;
+}
+#nav .it .nm {
+  font-size: 1.35vmin; letter-spacing: .1em;
+  transition: color .3s, opacity .3s;
+  opacity: .72;
+}
+#nav .it .pip {
+  width: .62vmin; height: .62vmin; border-radius: 50%;
+  background: #fff; transition: box-shadow .3s, transform .3s;
+}
+#nav .it:hover .nm { opacity: 1; }
+#nav .it.on .nm { color: var(--accent); opacity: 1; }
+#nav .it.on .pip { box-shadow: 0 0 0 1px var(--accent); transform: scale(1.1); }
+
+/* ---------------- 底部色卡 ---------------- */
+#colorbar {
+  position: fixed; left: 0; right: 0; bottom: 5.4vmin; z-index: 20;
+  display: flex; justify-content: center;
+  pointer-events: none;
+  opacity: 0; transform: translateY(1.6vmin);
+  transition: opacity .5s ease, transform .5s ease;
+}
+#colorbar.on { opacity: 1; transform: none; }
+#colorbar .pill {
+  display: flex; align-items: center; gap: .2vmin;
+  padding: .62vmin .9vmin;
+  border-radius: 2.4vmin;
+  background: #c8cdd41f;
+  backdrop-filter: blur(14px) saturate(1.3);
+  pointer-events: auto;
+}
+#colorbar .bar {
+  position: relative; width: 2.5vmin; height: 2.5vmin;
+  margin: 0 .35vmin;
+  border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  background-size: 100% 100%;
+  transition: transform .25s;
+}
+#colorbar .bar:hover { transform: scale(1.12); }
+#colorbar .bar::after {
+  content: ""; position: absolute; inset: -0.32vmin;
+  border-radius: 50%; box-shadow: 0 0 0 1px #ffffff00;
+  transition: box-shadow .25s;
+}
+#colorbar .bar.on::after { box-shadow: 0 0 0 1px #fff; }
+
+/* ---------------- 左侧滑杆 ---------------- */
+#sliders {
+  position: fixed; left: 3.6vmin; top: 50%;
+  transform: translateY(-50%) translateX(-2vmin);
+  z-index: 20; width: 23vmin;
+  opacity: 0; pointer-events: none;
+  transition: opacity .5s ease, transform .5s ease;
+}
+#sliders.on { opacity: 1; transform: translateY(-50%); pointer-events: auto; }
+.sl {
+  display: flex; align-items: center; gap: 1vmin;
+  margin-bottom: 2.6vmin;
+  font-size: 1.25vmin; color: #d3dae3;
+}
+.sl > span { width: 5.4vmin; flex: none; letter-spacing: .06em; }
+.sl > i { width: 3.4vmin; flex: none; font-style: normal; color: var(--dim); text-align: right; font-size: 1.1vmin; }
+.sl input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; height: 1.6vmin; background: none; cursor: pointer;
+}
+.sl input[type=range]::-webkit-slider-runnable-track {
+  height: 1px; background: #ffffff33;
+}
+.sl input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 1.05vmin; height: 1.05vmin; border-radius: 50%;
+  background: #fff; margin-top: -0.5vmin;
+  box-shadow: 0 0 8px rgba(255,255,255,.6);
+}
+#s-hue::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+}
+.sl-foot { display: flex; gap: 1vmin; margin-top: 3.2vmin; }
+.tg {
+  flex: 1; padding: .85vmin 0;
+  font-size: 1.15vmin; letter-spacing: .08em;
+  color: #cbd3dd; background: #ffffff12;
+  border: 1px solid #ffffff1f; border-radius: .5vmin;
+  cursor: pointer; transition: all .22s;
+}
+.tg:hover { background: #ffffff22; color: #fff; }
+.tg.on { color: #1a1006; background: var(--accent); border-color: var(--accent); }
+
+/* ---------------- 存图 ---------------- */
+#shot {
+  position: fixed; right: 3.4vmin; bottom: 5.6vmin; z-index: 21;
+  width: 3.4vmin; height: 3.4vmin; padding: 0;
+  border: 1px solid #ffffff2e; border-radius: 50%;
+  background: #ffffff10; color: #cfd7e1;
+  font-size: 1.5vmin; line-height: 1; cursor: pointer;
+  transition: transform .22s, background .22s, color .22s;
+}
+#shot:hover { transform: scale(1.12); background: #ffffff22; color: #fff; }
+
+/* ---------------- 底部提示 ---------------- */
+#hint {
+  position: fixed; left: 0; right: 0; bottom: 2.1vmin; z-index: 18;
+  display: flex; align-items: center; justify-content: center; gap: .8vmin;
+  font-size: 1.1vmin; color: #4f5763; letter-spacing: .22em;
+  pointer-events: none; transition: opacity .5s;
+}
+#hint span {
+  width: 1px; height: 2.6vmin; background: linear-gradient(to bottom, transparent, var(--accent));
+  animation: hint 2.1s ease-in-out infinite;
+}
+@keyframes hint { 0%,100% { opacity: .25; transform: translateY(-2px) } 50% { opacity: 1; transform: translateY(2px) } }
+body.scrolled #hint { opacity: 0; }
+
+/* ---------------- 竖屏 / 小屏 ---------------- */
+@media (max-aspect-ratio: 1/1) {
+  .ch { width: 92vw; }
+  .ch .body { max-width: 92vw; font-size: 2.9vmin; line-height: 1.8; }
+  .ch .kicker { font-size: 2.5vmin; }
+  .ch .title { font-size: clamp(26px, 7.4vmin, 52px); }
+  .ch[data-i="0"] .title { font-size: clamp(32px, 10vmin, 68px); }
+  .ch .lead { font-size: 2.9vmin; }
+  #logo { font-size: 2.7vmin; } #logo i { display: none; }
+  #meta, #free { display: none; }
+  #mute { top: 5.6vmin; right: 4.4vmin; width: 7vmin; height: 7vmin; font-size: 3vmin; }
+  #nav { top: 30vh; right: 2vmin; height: 40vh; }
+  #nav .it .nm { display: none; }
+  #nav .it .pip { width: 1.1vmin; height: 1.1vmin; }
+  #colorbar { bottom: 3.4vmin; }
+  #colorbar .bar { width: 5.6vmin; height: 5.6vmin; margin: 0 .7vmin; }
+  #sliders { left: 4vmin; width: 46vw; }
+  .sl { font-size: 2.4vmin; margin-bottom: 3.4vmin; }
+  .sl > span { width: 10vmin; }
+  .sl > i { width: 6vmin; font-size: 2.1vmin; }
+  #shot { display: none; }
+  #hint { font-size: 2vmin; }
+  .an .an-lb { font-size: 2.5vmin; }
+  #wm { left: 4vmin; bottom: 3vmin; }
+  #wm b { font-size: 15vmin; }
+  #wm i { font-size: 2vmin; }
+}

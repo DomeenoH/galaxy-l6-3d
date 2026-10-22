@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>吉利银河 L6 · 2024 款 3D 展厅</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body>
+
+<div id="loader"><div class="ld-inner"><span class="dot"></span>正在装配模型…</div></div>
+<div id="toast"></div>
+<div class="drop-hint">松手即载入 GLB</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo"></span>
+    <div>
+      <h1>吉利银河 L6</h1>
+      <p>2024 款 · 白外棕内 · 实时 3D 展厅</p>
+    </div>
+  </div>
+  <nav class="quick">
+    <a class="quick-link" href="./story.html">滚动分镜版 →</a>
+    <button data-view="front45" class="on">前 45°</button>
+    <button data-view="side">正侧</button>
+    <button data-view="rear45">后 45°</button>
+    <button data-view="front">正前</button>
+    <button data-view="top">俯视</button>
+    <button data-view="inside">内饰</button>
+  </nav>
+</header>
+
+<main class="stage">
+  <canvas id="scene"></canvas>
+
+  <div class="hint">拖动旋转 · 滚轮缩放 · 右键平移</div>
+
+  <aside class="panel">
+    <div class="grp">
+      <h3>车漆</h3>
+      <div class="swatches">
+        <button data-paint="pearl" class="sw on" style="--c:#f4f6f9" title="珍珠白"></button>
+        <button data-paint="silver" class="sw" style="--c:#b9c0ca" title="云曦银"></button>
+        <button data-paint="grey"   class="sw" style="--c:#6e747d" title="星际灰"></button>
+        <button data-paint="black"  class="sw" style="--c:#14161a" title="曜石黑"></button>
+        <button data-paint="blue"   class="sw" style="--c:#1d3f78" title="星夜蓝"></button>
+        <button data-paint="green"  class="sw" style="--c:#2c4a3c" title="极光绿"></button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <h3>内饰</h3>
+      <div class="chips">
+        <button data-int="brown" class="chip on">棕色</button>
+        <button data-int="black" class="chip">黑色</button>
+        <button data-int="cream" class="chip">米白</button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <h3>显示</h3>
+      <div class="chips col">
+        <button id="btn-lights" class="chip wide">车灯 · 熄灭</button>
+        <button id="btn-xray" class="chip wide">车身 · 透视</button>
+        <button id="btn-spin" class="chip wide on">自动旋转</button>
+        <button id="btn-reset" class="chip wide ghost">复位</button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <h3>参数</h3>
+      <div id="specs" class="specs"></div>
+    </div>
+  </aside>
+</main>
+
+<section class="real">
+  <div class="real-head">
+    <h2>换成真实模型</h2>
+    <p>页面已经接好 GLTF 管线：把任意 <code>.glb</code> 拖进窗口，或点下面的框选文件，就会替换掉程序化车模并自动对焦。</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <b>1</b>
+      <div>
+        <h4>拿文件</h4>
+        <p>Sketchfab 上两个银河 L6 模型都是免费 CC BY，登录后点 Download 拿 zip，解压出 <code>.glb</code>。</p>
+        <p class="mini">hotfix_modland 版：白外 + 带内饰，142 万面<br>Geely Galaxy L6 (2025) 版：30 万面，直接是 glb</p>
+      </div>
+    </div>
+    <div class="step">
+      <b>2</b>
+      <div>
+        <h4>丢进来</h4>
+        <p>拖到这个框里，或者放到项目根目录命名成 <code>model.glb</code>（页面启动时会自动找它）。</p>
+      </div>
+    </div>
+    <div class="step">
+      <b>3</b>
+      <div>
+        <h4>就这样</h4>
+        <p>自动居中、按 4782mm 车长归一化、落到地面、开阴影。剩下旋转缩放都还能用。</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="dropzone" class="dropzone">
+    <span class="dz-icon"></span>
+    <b>把 .glb / .gltf 拖到这里</b>
+    <span class="dz-sub">或点击选择文件</span>
+  </div>
+
+  <div class="real-head" style="margin-top:56px">
+    <h2>在线对照（不下载也能看）</h2>
+    <p>Sketchfab 官方嵌入。点开才加载，不影响上面展厅速度。</p>
+  </div>
+  <div class="real-grid">
+    <div class="sf-card" data-sf="777d0b45c978489fac7849f2c2682494">
+      <div class="sf-frame">
+        <button class="sf-load">加载「银河 L6 白外带内饰」模型<small>by zapkolenko07 · CC BY</small></button>
+      </div>
+      <div class="sf-meta">
+        <b>吉利银河 L6（白外 / 带内饰）</b>
+        <span>142 万面 · 游戏提取 · CC BY</span>
+        <a href="https://sketchfab.com/3d-models/l6-hotfix-modland-777d0b45c978489fac7849f2c2682494" target="_blank" rel="noopener">在 Sketchfab 打开 ↗</a>
+      </div>
+    </div>
+    <div class="sf-card" data-sf="036a5582f82d46f8ab8ecea0f8fc11c8">
+      <div class="sf-frame">
+        <button class="sf-load">加载「Geely Galaxy L6 (2025)」模型<small>by MimmoLagonigro · CC BY</small></button>
+      </div>
+      <div class="sf-meta">
+        <b>Geely Galaxy L6 (2025)</b>
+        <span>30 万面 · 多视角重建 · CC BY</span>
+        <a href="https://sketchfab.com/3d-models/geely-galaxy-l6-2025-036a5582f82d46f8ab8ecea0f8fc11c8" target="_blank" rel="noopener">在 Sketchfab 打开 ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>本页模型为按公开尺寸（4782×1875×1489 / 轴距 2752）程序化重建，用于造型预览，非官方数据。对照模型版权归原作者，遵循 CC BY 4.0。</p>
+</footer>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>

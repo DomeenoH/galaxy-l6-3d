@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>吉利银河 L6 · 电混家轿</title>
+<link rel="stylesheet" href="./story.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body class="loading">
+
+<canvas id="gl"></canvas>
+<div class="scrim"></div>
+<div class="grain"></div>
+<div id="flash"></div>
+
+<!-- ============ 预加载 ============ -->
+<div id="preloader">
+  <div class="pl-ring">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle class="pl-bg" cx="50" cy="50" r="45"/>
+      <circle class="pl-fg" id="pl-arc" cx="50" cy="50" r="45"/>
+    </svg>
+    <div class="pl-num"><b id="pl-pct">0</b><i>%</i></div>
+  </div>
+  <div class="pl-tip" id="pl-tip">正在装配模型…</div>
+  <div class="pl-ver">GALAXY&nbsp;L6 · REAL-TIME</div>
+</div>
+
+<!-- ============ 顶栏 ============ -->
+<div id="logo"><span class="mark"></span><b>吉利银河 L6</b><i>2024 款 · 插电混动</i></div>
+<div id="meta">实时渲染 three.js · 模型 Sketchfab</div>
+<a id="free" href="./index.html">自由查看版 ↗</a>
+<button id="mute" title="声音">♪</button>
+
+<!-- ============ 章节文案（顶部居中） ============ -->
+<div id="topinfo">
+
+  <section class="ch" data-i="0">
+    <p class="kicker">「电混家轿」</p>
+    <h1 class="title">银河 <em>L6</em></h1>
+    <p class="lead">4782mm 车长 · 2752mm 轴距 · 雷神电混 8848</p>
+  </section>
+
+  <section class="ch" data-i="1">
+    <p class="kicker">「外观设计」</p>
+    <h2 class="title">修长车身，<em>一条线</em>走到底</h2>
+    <p class="body">4782mm 车长配 2752mm 轴距，短前悬、长后悬。<br>溜背线条从 A 柱一路压到车尾，风阻与姿态同时拿下。</p>
+  </section>
+
+  <section class="ch" data-i="2">
+    <p class="kicker">「雷神电混 8848」</p>
+    <h2 class="title"><em>287</em> 千瓦，535 牛·米</h2>
+    <p class="body">1.5T 混动专用发动机 120kW / 255N·m，前置电机 107kW / 338N·m，<br>3 挡 DHT 把两股力拧在一起。</p>
+  </section>
+
+  <section class="ch" data-i="3">
+    <p class="kicker">「续航与座舱」</p>
+    <h2 class="title">CLTC <em>1370</em> 公里</h2>
+    <p class="body">125 公里纯电通勤，满油满电 1370 公里综合续航；<br>30%→80% 快充 0.5 小时，车机用高通骁龙 8155。</p>
+  </section>
+
+  <section class="ch" data-i="4">
+    <p class="kicker">「定制」</p>
+    <h2 class="title">换一身<em>颜色</em></h2>
+  </section>
+
+</div>
+
+<!-- ============ 第 5 章大字水印 ============ -->
+<div id="wm"><b>L6</b><i>GEELY&nbsp;GALAXY</i></div>
+
+<!-- ============ 3D 标注层 ============ -->
+<div id="annot"></div>
+
+<!-- ============ 右侧章节点 ============ -->
+<nav id="nav" aria-label="章节导航">
+  <div class="rail"></div>
+  <div class="items" id="nav-items"></div>
+</nav>
+
+<!-- ============ 底部色卡 ============ -->
+<div id="colorbar">
+  <div class="pill" id="cb-pill"></div>
+</div>
+
+<!-- ============ 左侧滑杆（第 5 章） ============ -->
+<aside id="sliders">
+  <label class="sl"><span>色相</span><input id="s-hue" type="range" min="0" max="360" value="212"><i id="v-hue">212</i></label>
+  <label class="sl"><span>饱和度</span><input id="s-sat" type="range" min="0" max="100" value="6"><i id="v-sat">6</i></label>
+  <label class="sl"><span>明度</span><input id="s-val" type="range" min="20" max="100" value="96"><i id="v-val">96</i></label>
+  <label class="sl"><span>金属度</span><input id="s-metal" type="range" min="0" max="100" value="52"><i id="v-metal">52</i></label>
+  <label class="sl"><span>粗糙度</span><input id="s-rough" type="range" min="0" max="100" value="24"><i id="v-rough">24</i></label>
+  <div class="sl-foot">
+    <button id="btn-lights" class="tg">车灯</button>
+    <button id="btn-cover" class="tg">内饰</button>
+  </div>
+</aside>
+
+<!-- ============ 存图 ============ -->
+<button id="shot" title="存一张图">◉</button>
+
+<!-- ============ 底部提示 ============ -->
+<div id="hint"><span></span>滚动 / ↑↓ 切换</div>
+
+<script type="module" src="./story.js"></script>
+</body>
+</html>

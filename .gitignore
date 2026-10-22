@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# 转换过程临时产物（tools/convert-dae.html 的中间输入）
+tools/file17.jpg
+
+# 本地截图工作目录
+/shots/
